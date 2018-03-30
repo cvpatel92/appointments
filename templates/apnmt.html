@@ -1,0 +1,122 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appointment System</title>
+<style type="text/css">
+td, th {
+	border: solid 1px black;
+}
+
+.input {
+	margin-left: 10px;
+}
+</style>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+	$(document).ready(function() {
+		$("#newid").click(function() {
+			$("#atdivid").css('display', 'block')
+		});
+		$("#cancelid").click(function() {
+			$("#atdivid").css('display', 'none')
+		});
+	});
+
+	$(document)
+			.ready(
+					function() {
+						$("#sapid")
+								.click(
+										function() {
+											var input_string = $("#searchid")
+													.val();
+											$
+													.ajax({
+														url : "/appointments/general/",
+														type : "POST",
+														dataType : "json",
+														data : {
+															client_response : input_string,
+															csrfmiddlewaretoken : '{{ csrf_token }}'
+														},
+														success : function(json) {
+															if (json) {
+																len = json.length;
+																var txt = "";
+																if (len > 0) {
+																	txt = "<table><tr><th>DATE</th><th>TIME</th><th>DESC</th></tr>";
+																	for (var i = 0; i < len; i++) {
+																		if (json[i].date
+																				&& json[i].time
+																				&& json[i].desc) {
+																			txt += "<tr><td>"
+																					+ json[i].date
+																					+ "</td><td>"
+																					+ json[i].time
+																					+ "</td><td>"
+																					+ json[i].desc
+																					+ "</td></tr>";
+																		}
+																	}
+																	if (txt != "") {
+																		document
+																				.getElementById("result").innerHTML = "";
+																		$(
+																				"#result")
+																				.append(
+																						txt);
+																	}
+																}
+															}
+														},
+														error : function(xhr,
+																errmsg, err) {
+															alert("something is wrong"
+																	+ xhr.status
+																	+ ": "
+																	+ xhr.responseText);
+														}
+													});
+											return false;
+										});
+					});
+</script>
+
+</head>
+<body>
+	<div name="atdiv" id="atdivid" style="display: none;">
+		<form method="post" name="addform" id="addformid">
+			{% csrf_token %}
+
+			<button name="add" id="addid" type="submit" value="add">ADD</button>
+			<button name="cancel" id="cancelid" value="CANCEL">CANCEL</button>
+			<br> <br> <Label name="ldate" value="ldate" id="ldateid">Date</Label>
+			<input type="date" name="date" id="dateid" required="required"
+				class="input"><br>
+			<br> <Label value="ltime" name="ltime" id="ltypeid">Time</Label>
+			<input type="time" name="time" id="timeid" required="required"
+				class="input"> <br>
+			<br> <Label value="ldesc" name="ldesc" id="ldescid">Desc</Label>
+			<input type="text" name="desc" id="descid" required="required"
+				class="input">
+		</form>
+	</div>
+
+	<div>
+		<button name="new" id="newid" value="new">NEW</button>
+		<br> <br>
+		<form name="searchform" id="searchformid" method="post">
+			{% csrf_token %} <input type="text" name="search" id="searchid"
+				value="">
+			<button name="sap" value="sap" id="sapid" type="submit">search</button>
+		</form>
+	</div>
+
+	<div name="result" , id="result"></div>
+	</table>
+	</div>
+</body>
+</html>
